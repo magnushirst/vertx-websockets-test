@@ -97,3 +97,16 @@ ws.onclose = function()
 {
   alert("Connection is closed...");
 };
+
+var handleKey = function(e) {
+  var action = "";
+  switch (e.key) {
+    case "a": action = "left"; break;
+    case "w": action = "up"; break;
+    case "d": action = "right"; break;
+    case "s": action = "down"; break;
+  }
+  ws.send(JSON.stringify({ "action": action }));
+}
+
+window.addEventListener("keypress", handleKey, false);
