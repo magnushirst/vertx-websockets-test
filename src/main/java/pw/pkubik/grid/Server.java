@@ -1,9 +1,10 @@
 package pw.pkubik.grid;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.ServerWebSocket;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.impl.StaticHandlerImpl;
 
@@ -21,14 +22,11 @@ public class Server extends AbstractVerticle {
         router.route("/static/*").handler(new StaticHandlerImpl());
 
         HttpServer server = vertx.createHttpServer().requestHandler(router::accept);
+        
+        List<Session> sessions = new LinkedList<Session>();
 
-        server.websocketHandler(new Handler<ServerWebSocket>() {
-
-            @Override
-            public void handle(ServerWebSocket sws) {
-                new PlayerSession(vertx, sws, game.createPlayer(), game);
-            }
-        });
+        server.websocketHandler( socket ->
+            sessions.add(new PlayerSession(vertx, sessions, socket, game.createPlayer(), game)));
 
         server.listen(8080);
     }

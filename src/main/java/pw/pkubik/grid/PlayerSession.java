@@ -1,5 +1,6 @@
 package pw.pkubik.grid;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import io.vertx.core.Vertx;
@@ -12,8 +13,8 @@ class PlayerSession extends Session {
     private final Game game;
     private final Player player;
 
-    public PlayerSession(Vertx vertx, ServerWebSocket socket, long clientId, Game game) {
-        super(vertx, socket, clientId);
+    public PlayerSession(Vertx vertx, List<Session> sessions, ServerWebSocket socket, long clientId, Game game) {
+        super(vertx, sessions, socket, clientId);
         this.game = game;
         this.player = game.getPlayers().get(clientId);
         
@@ -21,19 +22,12 @@ class PlayerSession extends Session {
                 .put("fields", new JsonArray(game.getWorld().getFields()))
                 .put("playerId", clientId);
         send(jsonObject);
+        sendToAll(playersStateJson());
     }
 
     @Override
     protected void periodicEvent() {
-        JsonArray jsonArray = new JsonArray();
-        for (Entry<Long, Player> entry : game.getPlayers().entrySet()) {
-            jsonArray.add(new JsonObject()
-                    .put("id", entry.getKey())
-                    .put("x", entry.getValue().getPosition().getX())
-                    .put("y", entry.getValue().getPosition().getY())
-                    );
-        }
-        send(new JsonObject().put("players", jsonArray));
+        send(playersStateJson());
     }
     
     @Override
@@ -54,6 +48,20 @@ class PlayerSession extends Session {
                 player.moveRight(); break;
             }
         }
+        
+        sendToAll(playersStateJson());
+    }
+    
+    private JsonObject playersStateJson() {
+        JsonArray jsonArray = new JsonArray();
+        for (Entry<Long, Player> entry : game.getPlayers().entrySet()) {
+            jsonArray.add(new JsonObject()
+                    .put("id", entry.getKey())
+                    .put("x", entry.getValue().getPosition().getX())
+                    .put("y", entry.getValue().getPosition().getY())
+                    );
+        }
+        return new JsonObject().put("players", jsonArray);
     }
 
     @Override

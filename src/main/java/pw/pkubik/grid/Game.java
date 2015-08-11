@@ -2,7 +2,6 @@ package pw.pkubik.grid;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 class Game {
     private final World world = new World(32, 25);
