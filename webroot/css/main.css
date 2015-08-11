@@ -1,0 +1,25 @@
+body {
+  background-color: #2cb02f;
+}
+
+.square {
+  fill: #3bb53b;
+  stroke-width: 2;
+  stroke: black;
+}
+
+.square:hover {
+  stroke: white;
+}
+
+.c1 {
+  fill: red;
+}
+
+.c2 {
+  fill: black;
+}
+
+.c3 {
+  fill: blue;
+}
